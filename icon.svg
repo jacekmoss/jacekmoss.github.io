@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8FD3F4"/><stop offset="1" stop-color="#FFF1C9"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- cztery kafelki gier -->
+  <g stroke="#fff" stroke-width="14">
+    <rect x="72" y="72" width="168" height="168" rx="40" fill="#2F6B45"/>
+    <rect x="272" y="72" width="168" height="168" rx="40" fill="#3B8A99"/>
+    <rect x="72" y="272" width="168" height="168" rx="40" fill="#E8775A"/>
+    <rect x="272" y="272" width="168" height="168" rx="40" fill="#8A6FDF"/>
+  </g>
+  <!-- łapka -->
+  <g fill="#FFF6DD" transform="translate(156 166) scale(2.4)">
+    <ellipse cx="0" cy="8" rx="12" ry="10"/>
+    <ellipse cx="-14" cy="-6" rx="5" ry="6.5"/><ellipse cx="-5" cy="-14" rx="5" ry="6.5"/>
+    <ellipse cx="6" cy="-14" rx="5" ry="6.5"/><ellipse cx="15" cy="-6" rx="5" ry="6.5"/>
+  </g>
+  <!-- rybka -->
+  <g transform="translate(360 156) scale(1.6)">
+    <path d="M-30 0 L-46 -14 L-42 0 L-46 14Z" fill="#FFD166"/>
+    <path d="M34 0 C22 -20 -8 -22 -32 0 C-8 22 22 20 34 0Z" fill="#FFD166"/>
+    <circle cx="20" cy="-4" r="4" fill="#10232E"/>
+  </g>
+  <!-- czapka kucharska -->
+  <g fill="#fff" transform="translate(156 356)">
+    <circle cx="-28" cy="-18" r="24"/><circle cx="0" cy="-30" r="28"/><circle cx="28" cy="-18" r="24"/>
+    <rect x="-34" y="-14" width="68" height="44" rx="6"/>
+    <rect x="-34" y="18" width="68" height="10" fill="#F4C7B8"/>
+  </g>
+  <!-- kredka -->
+  <g transform="translate(356 356) rotate(-45)">
+    <rect x="-60" y="-14" width="90" height="28" rx="4" fill="#FFD166"/>
+    <path d="M30 -14 L62 0 L30 14Z" fill="#F7E1B5"/>
+    <path d="M50 -5 L62 0 L50 5Z" fill="#2B2350"/>
+    <rect x="-66" y="-14" width="14" height="28" rx="4" fill="#F28AA0"/>
+  </g>
+</svg>

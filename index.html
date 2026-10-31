@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Moje gry">
+<meta name="theme-color" content="#8FD3F4">
+<title>Moje gry</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-512.png">
+<style>
+  /* ekran wyboru gier: duże obrazkowe kafelki, bez czytania; bez zewnętrznych czcionek, żeby działało offline */
+  :root {
+    --ink: #2B2350; --sun: #FFD166;
+    --face: "Segoe UI Rounded", "Segoe UI", Nunito, system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; margin: 0; }
+  body {
+    background: linear-gradient(180deg, #8FD3F4 0%, #CDEFFD 55%, #FFF4D6 100%) fixed;
+    color: var(--ink); font-family: var(--face);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh;
+    min-height: 100vh; min-height: 100dvh;
+    padding-block: max(16px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+    -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  /* tło: słońce, chmurki i pagórki, przypięte do dołu ekranu */
+  .scenery { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .scenery svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 38vh; }
+  .sun { position: absolute; top: 6vh; right: 8vw; width: 14vmin; height: 14vmin; border-radius: 50%;
+    background: radial-gradient(circle, #FFE58A 0 55%, rgba(255,229,138,.0) 72%); }
+  .sun::after { content: ""; position: absolute; inset: 18%; border-radius: 50%; background: var(--sun); }
+  .cloud { position: absolute; height: 5vmin; background: #fff; border-radius: 5vmin; opacity: .9; }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
+  .cloud::before { width: 45%; height: 160%; left: 15%; bottom: 20%; }
+  .cloud::after { width: 35%; height: 130%; left: 50%; bottom: 25%; }
+  .c1 { top: 9vh; left: 8vw; width: 18vmin; animation: drift 60s linear infinite alternate; }
+  .c2 { top: 20vh; left: 52vw; width: 12vmin; opacity: .75; animation: drift 80s linear infinite alternate-reverse; }
+  @keyframes drift { to { transform: translateX(12vw); } }
+
+  h1 {
+    margin: 1vh 0 0; font-size: clamp(36px, 8vmin, 80px); font-weight: 800; letter-spacing: .02em;
+    color: #fff; text-shadow: 0 3px 0 #F4A261, 0 6px 14px rgba(43,35,80,.25);
+  }
+  .games {
+    width: min(100%, 1180px);
+    display: grid; gap: clamp(14px, 3vmin, 32px);
+    grid-template-columns: repeat(auto-fit, minmax(clamp(130px, 24vmin, 230px), 1fr));
+    justify-items: center;
+  }
+  .game {
+    width: 100%; max-width: 260px; display: flex; flex-direction: column; align-items: center; gap: 1.2vmin;
+    text-decoration: none; color: var(--ink);
+    animation: pop .45s cubic-bezier(.3,1.5,.6,1) backwards;
+  }
+  .tile {
+    width: 100%; aspect-ratio: 1; border-radius: 22%; overflow: hidden; position: relative;
+    background: var(--c); border: 5px solid #fff;
+    box-shadow: 0 8px 0 color-mix(in srgb, var(--c) 70%, #000), 0 16px 26px rgba(43,35,80,.25);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .tile img { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .game span {
+    font-size: clamp(16px, 3.4vmin, 28px); font-weight: 700; text-align: center; line-height: 1.15;
+    background: rgba(255,255,255,.75); padding: .2em .7em; border-radius: 999px;
+  }
+  .game:active .tile, .game.go .tile { transform: translateY(6px) scale(.97);
+    box-shadow: 0 2px 0 color-mix(in srgb, var(--c) 70%, #000), 0 6px 12px rgba(43,35,80,.25); }
+  .game:focus-visible { outline: none; }
+  .game:focus-visible .tile { outline: 5px solid #F4A261; outline-offset: 4px; }
+  @keyframes pop { from { transform: scale(.6); opacity: 0; } }
+
+  /* niski ekran (telefon poziomo): mniejszy tytuł i ciaśniej */
+  @media (max-height: 520px) {
+    body { gap: 2vh; }
+    h1 { font-size: clamp(28px, 9vh, 48px); margin: 0; }
+    .games { grid-template-columns: repeat(auto-fit, minmax(clamp(110px, 30vh, 200px), 1fr)); gap: 3vh; }
+    .game span { font-size: clamp(13px, 4.2vh, 20px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .game, .cloud { animation: none; } .tile { transition: none; } }
+</style>
+</head>
+<body>
+  <div class="scenery" aria-hidden="true">
+    <div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div>
+    <svg viewBox="0 0 1200 300" preserveAspectRatio="none">
+      <path d="M0 170 C180 90 360 110 520 160 C700 215 880 120 1200 150 V300 H0Z" fill="#A8DB8F"/>
+      <path d="M0 230 C220 170 420 200 620 230 C820 260 1000 190 1200 215 V300 H0Z" fill="#7CC36E"/>
+    </svg>
+  </div>
+
+  <h1>Moje gry</h1>
+  <nav class="games" id="games"></nav>
+
+  <noscript><p>Włącz JavaScript, żeby zobaczyć gry.</p></noscript>
+  <script src="/games.js"></script>
+  <script>
+    'use strict';
+    // kafelki z listy w games.js
+    const list = document.getElementById('games');
+    (window.GAMES || []).forEach((g, i) => {
+      const a = document.createElement('a');
+      a.className = 'game';
+      a.href = g.url;
+      a.style.setProperty('--c', g.color || '#7C5CFF');
+      a.style.animationDelay = (i * 70) + 'ms';
+      a.setAttribute('aria-label', g.name);
+      a.innerHTML = '<div class="tile"><img alt="" draggable="false"></div><span></span>';
+      a.querySelector('img').src = g.icon;
+      a.querySelector('span').textContent = g.name;
+      a.addEventListener('click', (e) => {
+        // krótkie „wciśnięcie” kafelka, potem do gry
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        a.classList.add('go');
+        setTimeout(() => { location.href = g.url; }, 160);
+      });
+      list.appendChild(a);
+    });
+    // po powrocie przyciskiem „wstecz” (bfcache) kafelek nie może zostać wciśnięty
+    addEventListener('pageshow', () => document.querySelectorAll('.game.go').forEach((a) => a.classList.remove('go')));
+
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+        // w tle zapisz w pamięci urządzenia wszystkie gry, żeby działały bez internetu
+        // nawet te, których dziecko jeszcze nie otwierało (raz na 12 godzin)
+        const KEY = 'gry-prefetch-at';
+        const last = +localStorage.getItem(KEY) || 0;
+        if (!navigator.onLine || !('caches' in window) || Date.now() - last < 12 * 3600e3) return;
+        setTimeout(() => prefetchAll().then(() => localStorage.setItem(KEY, String(Date.now()))).catch(() => {}), 1500);
+      });
+    }
+
+    async function prefetchAll() {
+      const cache = await caches.open('gry-gry');
+      const urls = new Set(['/home.js']);
+      for (const g of window.GAMES || []) {
+        urls.add(g.icon);
+        const base = new URL(g.url, location.href);
+        try {
+          const res = await fetch(base, { cache: 'no-cache' });
+          if (!res.ok) continue;
+          await cache.put(base, res.clone());
+          const html = await res.text();
+          // pliki gry wskazane w jej index.html (skrypty, ikony, manifest)
+          for (const m of html.matchAll(/(?:src|href)\s*=\s*["']([^"'#?]+)["']/g)) {
+            const ref = m[1];
+            if (/^(?:[a-z]+:|\/\/|data:)/i.test(ref)) continue;
+            urls.add(new URL(ref, base).pathname);
+          }
+        } catch (_) { /* bez sieci – spróbujemy następnym razem */ }
+      }
+      await Promise.all([...urls].map((u) => fetch(u, { cache: 'no-cache' })
+        .then((r) => (r.ok ? cache.put(u, r) : null)).catch(() => {})));
+    }
+  </script>
+</body>
+</html>
